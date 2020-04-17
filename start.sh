@@ -8,8 +8,8 @@ if lsof -Pni :443 | grep LISTEN >/dev/null; then
   exit 1
 fi
 
-if [[ "$(uname)" -ne "Darwin" ]]; then
-  echo Only support MacOS for now.
+if ! cat /etc/os-release | grep Ubuntu >/dev/null; then
+  echo Only support Ubuntu.
   exit 1
 fi
 
@@ -23,23 +23,17 @@ if ! docker info > /dev/null 2>&1; then
   exit 1
 fi
 
-if [ ! -d "/Applications/Firefox.app" ]; then
-  brew cask install firefox
+if ! type -p openssl &>/dev/null; then
+  echo Install openssl...
+  apt install openssl
 fi
 
-if ! type -p mkcert &>/dev/null; then
-  echo Install mkcert...
-  open -a /Applications/Firefox.app
-  brew install mkcert nss
-fi
-
-if type -p mkcert &>/dev/null; then
+if type -p openssl &>/dev/null; then
   echo Create ssl certificate...
-  mkcert -install
-  mkcert \
-    -cert-file cert.pem \
-    -key-file cert-key.pem \
-    localhost 127.0.0.1 ::1
+  openssl req -newkey rsa:2048 -new -nodes -x509 -days 365 \
+    -out cert.pem \
+    -keyout cert-key.pem \
+    -subj /C='MA'/ST=' '/L=' '/O=' '/OU=' '/CN=' ' &>/dev/null
 fi
 
 echo Starting nginx...
