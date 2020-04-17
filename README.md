@@ -5,7 +5,7 @@ Running nginx as reverse proxy in front of web and api server.
 
 ## Feature
 
-* Support HTTPS by using [mkcert](https://github.com/FiloSottile/mkcert).
+* Support HTTPS by using OpenSSL.
 * Redirect HTTP to HTTPS automatically.
 * Provide access log and error log.
 
